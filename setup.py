@@ -1,18 +1,8 @@
 """
 
-    Declare a Python package youraddon
-
-    See 
-
-    * http://wiki.python.org/moin/Distutils/Tutorial
-
-    * http://packages.python.org/distribute/setuptools.html#developer-s-
-
-    * http://plone.org/products/plone/roadmap/247
-
 """
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(name = "Products.youraddon",
     version = "0.0",
@@ -20,14 +10,16 @@ setup(name = "Products.youraddon",
     author = "",
     author_email = "",
     url = "",
-      install_requires=[
-          'setuptools',
-          # -*- Extra requirements: -*-
-      ],
-    packages = ['youraddon'],
+    install_requires=[
+        'setuptools',
+        # -*- Extra requirements: -*-
+    ],
+    namespace_packages=['Products'],    
+    packages=find_packages(exclude=['ez_setup']),
     classifiers=[
         "Framework :: Plone",
         "Programming Language :: Python",
+        "Framework :: Zope2",        
     ],     
     license="GPL2",
     include_package_data = True,   

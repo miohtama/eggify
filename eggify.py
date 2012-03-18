@@ -17,6 +17,7 @@ FILES_TO_DELETE=[
     ".git", 
     "README.rst", 
     "Products.youraddon.egg-info", 
+    "eggify.py"
 ]
 
 def process(fname, newname):
@@ -74,7 +75,7 @@ def post_copy_in(source, target):
 	"""
 	shutil.copytree(source, target)
 
-def post_cleanup(target, newname):
+def post_cleanup(target):
     """
     Remove unneeded files.
     """
@@ -90,11 +91,13 @@ def post_cleanup(target, newname):
 def fancy_replace(source, target):
     """ """
 
-    target = os.path.join(os.getcwd(), "..", newname)
     if os.path.exists(target):
         print "Already exists:" + target
         print "Plese remove first"
         sys.exit(1)
+
+    # Python source module name
+    module_name = os.path.basename(source)
 
     # Where are our template files
     template = os.getcwd()
@@ -102,20 +105,19 @@ def fancy_replace(source, target):
     # Create a copy of the skeleton
     shutil.copytree(template, target)
 
-    post_cleanup(target, newname)
+    post_cleanup(target)
 
     # Replace strings and filenames
     for root, dirs, files in os.walk(target, topdown=False):
         for name in files:
             fname = os.path.join(root, name)
-            process(fname, newname)
+            process(fname, module_name)
     
         for name in dirs:
             fname = os.path.join(root, name)
-            process(fname, newname)
+            process(fname, module_name)
 
-    module_name = os.path.basename(source)
-    post_copy_in(os.path.join(source, "Products"), os.path.join(target, module_name))
+    post_copy_in(source, os.path.join(target, "Products", module_name))
 
     print "Created:" + target
 
@@ -126,8 +128,9 @@ def scan(source, target):
 
 	for f in os.listdir(source):
 		fname = os.path.join(source, f)
-		if os.path.isdir(fname):
-			ftarget = os.path.join(target, f)
+		if os.path.isdir(fname) and not f.startswith("."):
+			# Ignore hidden directories and misc files
+			ftarget = os.path.join(target, "Products." + f)
 			fancy_replace(fname, ftarget)
 
 def main():
